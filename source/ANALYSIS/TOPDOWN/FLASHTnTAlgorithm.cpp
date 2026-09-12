@@ -287,6 +287,11 @@ void FLASHTnTAlgorithm::run(const MSExperiment& map, const std::vector<FASTAFile
       cleaned_protein_seqs.push_back(cleaned_seq);
     }
 
+    if (taget_count == 0)
+    {
+      throw Exception::InvalidValue(__FILE__, __LINE__, OPENMS_PRETTY_FUNCTION,
+        "FLASHTnT requires at least one target protein in the FASTA database", "fasta");
+    }
     decoy_factor_ = decoy_count / taget_count;
   }
 
@@ -299,7 +304,7 @@ void FLASHTnTAlgorithm::run(const MSExperiment& map, const std::vector<FASTAFile
     blind_mod_map[mod.getDiffMonoMass()].push_back(mod);
   }
 
-  double precursor_tol = -1, tol;
+  double precursor_tol = -1, tol = 0;
 
   startProgress(0, (SignedSize)map.size(), "Finding sequence tags ...");
 
@@ -314,69 +319,78 @@ void FLASHTnTAlgorithm::run(const MSExperiment& map, const std::vector<FASTAFile
 
     DeconvolvedSpectrum dspec(scan);
     dspec.setOriginalSpectrum(spec);
+    if (!spec.metaValueExists("DeconvMassInfo"))
+    {
+      throw Exception::MissingInformation(__FILE__, __LINE__, OPENMS_PRETTY_FUNCTION,
+        "FLASHTnT requires deconvolved mzML from FLASHDeconv (-out_mzml): missing DeconvMassInfo");
+    }
     std::string deconv_meta_str = spec.getMetaValue("DeconvMassInfo").toString();
-
-    int tol_loc_s = deconv_meta_str.find("tol=") + 4;
-    int tol_loc_e = deconv_meta_str.find(";", tol_loc_s);
-
-    tol = stod(deconv_meta_str.substr(tol_loc_s, tol_loc_e - tol_loc_s));
+    auto field = [&deconv_meta_str](const std::string& name)
+    {
+      const auto key = name + "=";
+      auto start = deconv_meta_str.find(key);
+      if (start == std::string::npos || (start > 0 && deconv_meta_str[start - 1] != ';'))
+      {
+        throw Exception::MissingInformation(__FILE__, __LINE__, OPENMS_PRETTY_FUNCTION,
+          "Missing FLASHDeconv metadata field: " + name);
+      }
+      start += key.size();
+      const auto end = deconv_meta_str.find(';', start);
+      return deconv_meta_str.substr(start, end == std::string::npos ? end : end - start);
+    };
+    auto numeric_list = [&field, &spec](const std::string& name)
+    {
+      std::vector<std::string> tokens;
+      StringUtils::split(field(name), ',', tokens);
+      if (!tokens.empty() && tokens.back().empty()) tokens.pop_back();
+      if (tokens.size() != spec.size())
+      {
+        throw Exception::InvalidValue(__FILE__, __LINE__, OPENMS_PRETTY_FUNCTION,
+          "FLASHDeconv metadata count does not match spectrum peaks", name);
+      }
+      std::vector<double> values;
+      values.reserve(tokens.size());
+      for (const auto& token : tokens)
+      {
+        const auto value = StringUtils::toDouble(token);
+        if (!std::isfinite(value))
+        {
+          throw Exception::InvalidValue(__FILE__, __LINE__, OPENMS_PRETTY_FUNCTION,
+            "FLASHDeconv metadata must contain finite values", name);
+        }
+        values.push_back(value);
+      }
+      return values;
+    };
+    tol = StringUtils::toDouble(field("tol"));
+    if (!std::isfinite(tol) || tol <= 0)
+    {
+      throw Exception::InvalidValue(__FILE__, __LINE__, OPENMS_PRETTY_FUNCTION,
+        "FLASHDeconv mass tolerance must be finite and positive", "tol");
+    }
     if (spec.getMSLevel() == 1 && precursor_tol < 0)
     {
       precursor_tol = tol;
       // continue;
     }
 
-    int q_loc_s = deconv_meta_str.find("qscore=") + 7;
-    int q_loc_e = deconv_meta_str.find(";", q_loc_s);
-    auto q_str = deconv_meta_str.substr(q_loc_s, q_loc_e - q_loc_s);
-    Size pos = 0;
-    std::vector<double> qscores;
-    while (true)
-    {
-      Size pos_t = q_str.find(",", pos);
-      if (pos_t == std::string::npos) break;
-      auto token = q_str.substr(pos, pos_t - pos);
-      qscores.push_back(stod(token));
-      pos = pos_t + 1;
-    }
-
-    int s_loc_s = deconv_meta_str.find("snr=") + 4;
-    int s_loc_e = deconv_meta_str.find(";", s_loc_s);
-    auto s_str = deconv_meta_str.substr(s_loc_s, s_loc_e - s_loc_s);
-    pos = 0;
-    std::vector<float> snrs;
-    while (true)
-    {
-      Size pos_t = s_str.find(",", pos);
-      if (pos_t == std::string::npos) break;
-      auto token = s_str.substr(pos, pos_t - pos);
-      snrs.push_back(stof(token));
-      pos = pos_t + 1;
-    }
-
-    int s_loc_pre_s = deconv_meta_str.find("precursorscan=") + 14;
-    int s_loc_pre_e = deconv_meta_str.find(";", s_loc_pre_s);
-    int precursor_scan = stoi(deconv_meta_str.substr(s_loc_pre_s, s_loc_pre_e - s_loc_pre_s));
+    const auto qscores = numeric_list("qscore");
+    const auto snrs = numeric_list("snr");
+    const int precursor_scan = StringUtils::toInt(field("precursorscan"));
 
     if (precursor_scan > 0)
     {
-      int s_loc_prem_s = deconv_meta_str.find("precursormass=") + 14;
-      int s_loc_prem_e = deconv_meta_str.find(";", s_loc_prem_s);
-      double precursor_mass = stod(deconv_meta_str.substr(s_loc_prem_s, s_loc_prem_e - s_loc_prem_s));
+      double precursor_mass = StringUtils::toDouble(field("precursormass"));
       PeakGroup pg;
       pg.setMonoisotopicMass(precursor_mass);
       if (deconv_meta_str.contains("precursorscore="))
       {
-        int s_loc_preq_s = deconv_meta_str.find("precursorscore=") + 15;
-        int s_loc_preq_e = deconv_meta_str.find(";", s_loc_preq_s);
-        double precursor_qscore = stod(deconv_meta_str.substr(s_loc_preq_s, s_loc_preq_e - s_loc_preq_s));
+        double precursor_qscore = StringUtils::toDouble(field("precursorscore"));
         pg.setQscore2D(precursor_qscore);
       }
       if (deconv_meta_str.contains("precursorSNR="))
       {
-        int s_loc_pres_s = deconv_meta_str.find("precursorSNR=") + 13;
-        int s_loc_pres_e = deconv_meta_str.find(";", s_loc_pres_s);
-        double precursor_snr = stod(deconv_meta_str.substr(s_loc_pres_s, s_loc_pres_e - s_loc_pres_s));
+        double precursor_snr = StringUtils::toDouble(field("precursorSNR"));
         pg.setSNR(precursor_snr);
       }
 

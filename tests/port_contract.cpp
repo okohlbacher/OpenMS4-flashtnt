@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // $Maintainer: Oliver Kohlbacher $
 #include <OpenMS/ANALYSIS/TOPDOWN/FLASHTnTHelpers.h>
+#include <OpenMS/ANALYSIS/TOPDOWN/FLASHTnTAlgorithm.h>
 #include <OpenMS/CHEMISTRY/ProForma.h>
 #include <OpenMS/FORMAT/FLASHTnTFile.h>
 #include <stdexcept>
@@ -35,4 +36,20 @@ int main()
   std::vector<std::vector<OpenMS::Size>> paths;
   graph.findAllPaths(0, 2, paths, 10);
   require(paths == std::vector<std::vector<OpenMS::Size>>{{0, 1, 2}});
+
+  OpenMS::MSExperiment experiment;
+  OpenMS::MSSpectrum spectrum;
+  spectrum.setMSLevel(2);
+  spectrum.resize(5);
+  experiment.addSpectrum(spectrum);
+  const std::vector<OpenMS::FASTAFile::FASTAEntry> proteins{{"target", "fixture", "PEPTIDE"}};
+  rejected = false;
+  try { OpenMS::FLASHTnTAlgorithm().run(experiment, proteins); }
+  catch (const OpenMS::Exception::MissingInformation&) { rejected = true; }
+  require(rejected);
+  experiment[0].setMetaValue("DeconvMassInfo", "tol=10;precursorscan=-1;qscore=1,;snr=1,2,3,4,5,");
+  rejected = false;
+  try { OpenMS::FLASHTnTAlgorithm().run(experiment, proteins); }
+  catch (const OpenMS::Exception::InvalidValue&) { rejected = true; }
+  require(rejected);
 }
