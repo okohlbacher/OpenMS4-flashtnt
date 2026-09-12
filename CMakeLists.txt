@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 project(OpenMSFLASHTnT VERSION 1.0.0 LANGUAGES CXX)
+option(OPENMS4_WARNINGS_AS_ERRORS "Treat package compiler warnings as errors" OFF)
+set(CMAKE_COMPILE_WARNING_AS_ERROR ${OPENMS4_WARNINGS_AS_ERRORS})
 include(GNUInstallDirs)
 include(CTest)
 include(cmake/OpenMS4Dependencies.cmake)

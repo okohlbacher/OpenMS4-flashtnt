@@ -39,6 +39,14 @@ removes an unused Qt include, gives the private classes ordinary static linkage,
 and preserves the upstream normalization of tag sequences to uppercase.
 It rejects missing/truncated deconvolution metadata before indexing peak arrays
 and uses a sequential scan number when a spectrum has no native ID.
+Open-ended extension uses an endpoint of -1. The port fixes an inherited
+out-of-bounds read by inspecting the endpoint spectrum entry only when the
+endpoint is specified. The AQPZ test exercises this path and reproduced the
+invalid read under AddressSanitizer before the fix. To check it with GCC or
+Clang, use a separate build with
+`-DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g"`
+and run the same CTest suite. Dependencies must use a compatible compiler/runtime.
+`-DOPENMS4_WARNINGS_AS_ERRORS=ON` promotes package compiler warnings to errors.
 
 CTest also runs the bundled AQPZ example with FLASHApp's saved parameters. It
 requires nonempty result tables, the expected strongest AQPZ identification and
@@ -57,6 +65,13 @@ compared with 505/69 historically. Database and matched sequences and positions
 mutating uppercase operation removed an unintended port behavior change; the
 remaining historical differences have not been causally attributed or approved
 as scientifically equivalent.
+
+At source revision `250debb`, three Mac ARM runs produced byte-identical result
+tables with 698 tags (114 AQPZ tags), while repeated Linux x64 runs produced
+622 tags (96 AQPZ tags). The strongest AQPZ sequence, score, mass, fragment count
+and coverage agree across these platforms; tag counts do not. These observations
+predate the open-ended extension memory fix. Cross-platform numerical
+equivalence remains unqualified, and the historical reference is unchanged.
 
 The untouched historical counts, tag sequence multiplicities, mass, score and
 fragment fields remain in `tests/data/aqpz/reference.json`. Every run compares

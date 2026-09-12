@@ -1288,10 +1288,11 @@ namespace OpenMS
       }
     }
     // double start_delta_mass = start_node_mass - pro_masses[start_pro_index];
-    double end_node_mass = node_spec[end_node_index].getMZ();
-    double end_delta_mass = end_node_mass - pro_masses[end_pro_index];
     if (end_node_index >= 0)
     {
+      // A negative endpoint denotes open-ended extension, not a spectrum index.
+      double end_node_mass = node_spec[end_node_index].getMZ();
+      double end_delta_mass = end_node_mass - pro_masses[end_pro_index];
       double margin = tol_spec[end_node_index].getIntensity(); // tol_spec[end_node_index].getIntensity();
       if (std::abs(end_delta_mass - cumulative_mod_mass + truncation_mass) > max_mod_mass_ * (max_blind_mod_cntr - start_num_blind_mod) + margin)
       {
