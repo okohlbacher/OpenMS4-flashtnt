@@ -1,0 +1,68 @@
+{
+  "repository": "https://github.com/t0mdavid-m/OpenMS",
+  "source_revision": "3f508829ad81c91354d397966f28d428e29e5329",
+  "files": [
+    {
+      "path": "License.txt",
+      "upstream_path": "License.txt",
+      "git_object": "722acba66f6c997f78dd5dd2bf8054a85ce2887c"
+    },
+    {
+      "path": "src/FLASHTnT.cpp",
+      "upstream_path": "src/topp/FLASHTnT.cpp",
+      "git_object": "80628a74e452c5110a98358f78becabbddaa53d1"
+    },
+    {
+      "path": "source/FORMAT/FLASHTnTFile.cpp",
+      "upstream_path": "src/openms/source/FORMAT/FLASHTnTFile.cpp",
+      "git_object": "6f51b9dfff5457e9c70854b1b5e459311789c7db"
+    },
+    {
+      "path": "source/ANALYSIS/TOPDOWN/FLASHTnTAlgorithm.cpp",
+      "upstream_path": "src/openms/source/ANALYSIS/TOPDOWN/FLASHTnTAlgorithm.cpp",
+      "git_object": "afc1a650f195aa0428b2985d4b9be305b734f7cc"
+    },
+    {
+      "path": "source/ANALYSIS/TOPDOWN/FLASHTaggerAlgorithm.cpp",
+      "upstream_path": "src/openms/source/ANALYSIS/TOPDOWN/FLASHTaggerAlgorithm.cpp",
+      "git_object": "18ce082ffaf0fbd92afd7ba32b816fbbdf68ce00"
+    },
+    {
+      "path": "source/ANALYSIS/TOPDOWN/FLASHExtenderAlgorithm.cpp",
+      "upstream_path": "src/openms/source/ANALYSIS/TOPDOWN/FLASHExtenderAlgorithm.cpp",
+      "git_object": "6ae6f925fb90a0b84bdb1fbab34b781a90902ed6"
+    },
+    {
+      "path": "include/OpenMS/FORMAT/FLASHTnTFile.h",
+      "upstream_path": "src/openms/include/OpenMS/FORMAT/FLASHTnTFile.h",
+      "git_object": "dbb88cac1e34f915fdfeede2ddb3b0e04c4ec6a8"
+    },
+    {
+      "path": "include/OpenMS/ANALYSIS/TOPDOWN/FLASHTnTAlgorithm.h",
+      "upstream_path": "src/openms/include/OpenMS/ANALYSIS/TOPDOWN/FLASHTnTAlgorithm.h",
+      "git_object": "1bc84ef88c947fe563b1cfec3771f0ba8d874d85"
+    },
+    {
+      "path": "include/OpenMS/ANALYSIS/TOPDOWN/FLASHExtenderAlgorithm.h",
+      "upstream_path": "src/openms/include/OpenMS/ANALYSIS/TOPDOWN/FLASHExtenderAlgorithm.h",
+      "git_object": "0f61c5a406398d865256e2b803a07e4bc6f30c16"
+    },
+    {
+      "path": "include/OpenMS/ANALYSIS/TOPDOWN/FLASHTaggerAlgorithm.h",
+      "upstream_path": "src/openms/include/OpenMS/ANALYSIS/TOPDOWN/FLASHTaggerAlgorithm.h",
+      "git_object": "6dfaba5385a11cc82227ac5103ff17cc3b972f5a"
+    },
+    {
+      "path": "include/OpenMS/ANALYSIS/TOPDOWN/FLASHTnTHelpers.h",
+      "upstream_path": "src/openms/include/OpenMS/ANALYSIS/TOPDOWN/FLASHHelperClasses.h",
+      "git_object": "266492bd17c696377770d277b127d03bf51fb41a",
+      "extraction": "Tag and DAG declarations only"
+    },
+    {
+      "path": "source/ANALYSIS/TOPDOWN/FLASHTnTHelpers.cpp",
+      "upstream_path": "src/openms/source/ANALYSIS/TOPDOWN/FLASHHelperClasses.cpp",
+      "git_object": "89ae5da3d00dc5bcac5a9793623056c7126a09bc",
+      "extraction": "Tag method implementations only"
+    }
+  ]
+}
