@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   native:
     name: ${{ matrix.platform }} / Release
@@ -57,12 +61,6 @@ jobs:
           ref: d5213ff3551a8608e4e3f930fd4a6f85a8c82f97
           path: dependencies/cli
           persist-credentials: false
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          repository: okohlbacher/OpenMS4-test-data
-          ref: a14ecf5d5f5de878dbaf5ddb9feafe154b02303a
-          path: dependencies/test-data
-          persist-credentials: false
       - uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v3
         with:
           environment-file: tools/ci/environment.yml
@@ -73,7 +71,7 @@ jobs:
           cache-environment: true
           cache-environment-key: flashtnt-${{ matrix.platform }}
           post-cleanup: all
-      - name: Download and verify the pinned FLASH backend SDK
+      - name: Download and verify the pinned flash SDK
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/flash"
@@ -87,7 +85,7 @@ jobs:
             tr -d '\r' < *.sha256 | sha256sum -c -
           fi
           tar -xzf *.tar.gz
-      - name: Download and verify the pinned Core SDK
+      - name: Download and verify the pinned core SDK
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/core"
@@ -107,7 +105,6 @@ jobs:
           --platform ${{ matrix.platform }} --jobs ${{ (startsWith(runner.name, 'dax') && 24) || (startsWith(runner.name, 'studio') && 8) || matrix.jobs }}
           --core-dir "${{ runner.temp }}/core"
           --cli-source dependencies/cli
-          --test-data-source dependencies/test-data
           --flash-dir "${{ runner.temp }}/flash"
           --work-dir "${{ runner.temp }}/flashtnt"
       - name: Upload tested package

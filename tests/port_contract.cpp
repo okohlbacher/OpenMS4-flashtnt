@@ -31,7 +31,7 @@ int main()
   std::vector<double> masses{1.0, 2.0, 3.0};
   std::vector<int> scores{1, 2, 3};
   OpenMS::FLASHTnTHelpers::Tag tag("Pe", 0.0, -1.0, masses, scores, 10);
-  require(tag.getSequence() == "Pe" && tag.getUppercaseSequence() == "PE");
+  require(tag.getSequence() == "PE" && tag.getUppercaseSequence() == "PE");
   require(tag.getScore() == 6 && tag.getIndex() == -1);
   OpenMS::FLASHTnTHelpers::DAG graph(3);
   boost::dynamic_bitset<> visited(3);
