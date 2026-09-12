@@ -376,7 +376,7 @@ void FLASHTnTAlgorithm::run(const MSExperiment& map, const std::vector<FASTAFile
 
     const auto qscores = numeric_list("qscore");
     const auto snrs = numeric_list("snr");
-    const int precursor_scan = StringUtils::toInt(field("precursorscan"));
+    const int precursor_scan = StringUtils::toInt32(field("precursorscan"));
 
     if (precursor_scan > 0)
     {
