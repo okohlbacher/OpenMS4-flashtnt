@@ -49,6 +49,15 @@ that cache has no recorded binary revision, and the pinned upstream algorithms
 changed subsequently, including the December 2025 inverse-tag-direction fix
 (`8677e5015860a6ecce5e7bcc35295978040291b1`).
 
+On Linux x64, the four tests passed in 10.47 seconds (AQPZ: 10.13 seconds).
+The port produced 622 tags and 10 protein/PrSM rows; the historical cache has
+2,968 tags and 17 rows. Its best AQPZ score/matching-fragment count was 559/79,
+compared with 505/69 historically. Database and matched sequences and positions
+1–240 agree, while inferred mass and coverage differ. Restoring the upstream
+mutating uppercase operation removed an unintended port behavior change; the
+remaining historical differences have not been causally attributed or approved
+as scientifically equivalent.
+
 The untouched historical counts, tag sequence multiplicities, mass, score and
 fragment fields remain in `tests/data/aqpz/reference.json`. Every run compares
 them and writes `aqpz-results/acceptance.json`; differences are not replaced with

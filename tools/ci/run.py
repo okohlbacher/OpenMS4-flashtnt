@@ -164,8 +164,13 @@ def main() -> None:
         # tests cannot start without it.
         dll_dirs = sorted({str(path.parent) for path in build.rglob("*.dll")})
         env["PATH"] = os.pathsep.join([*dll_dirs, env["PATH"]])
-    run("test-package", ["ctest", "--test-dir", str(build), "-C", configuration,
-                      "--output-on-failure", "--no-tests=error", "--parallel", str(args.jobs)])
+    try:
+        run("test-package", ["ctest", "--test-dir", str(build), "-C", configuration,
+                          "--output-on-failure", "--no-tests=error", "--parallel", str(args.jobs)])
+    finally:
+        # Preserve scientific comparisons even when native acceptance fails.
+        if (build / "aqpz-results").is_dir():
+            shutil.copytree(build / "aqpz-results", results / "aqpz", dirs_exist_ok=True)
     run("install-package", ["cmake", "--install", str(build), "--config", configuration])
     check_install(install, tools, windows)
     env["OPENMS_TOOL_PREFIX_PATH"] = str(install)
