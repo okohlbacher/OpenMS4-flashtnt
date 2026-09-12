@@ -34,4 +34,6 @@ tests and representative scientific output checks before release.
 The port also replaces removed OpenMS String operations with standard strings,
 removes an unused Qt include, gives the private classes ordinary static linkage,
 and stores uppercase tag sequences without mutating their original case.
+It rejects missing/truncated deconvolution metadata before indexing peak arrays
+and uses a sequential scan number when a spectrum has no native ID.
 No compatible FLASHTnT artifact or scientific acceptance is claimed yet.

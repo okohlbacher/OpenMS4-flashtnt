@@ -49,14 +49,14 @@ public:
 
   /**
    * The main run function to perform extension algorithm. Take the candidate protein hits and perform extension for each protein with the tags.
-   * @param hits the candidate protein hits
-   * @param dspec the deconvolved spectrum
-   * @param spec_vec
-   * @param vec_pro
-   * @param rev_vec_pro
-   * @param tags the sequence tags from FLASHTaggerAlgorithm
-   * @param ppm mass ppm tolerance
-   * @param multiple_hits_per_spec should multiple proteins be considered per spectrum or only the best protein should be considered?
+   * @param[in,out] hits Candidate protein hits, updated with extension scores and modification assignments.
+   * @param[in] dspec Deconvolved spectrum.
+   * @param[in] spec_vec Vectorized spectrum masses.
+   * @param[in] vec_pro Vectorized protein prefix masses.
+   * @param[in] rev_vec_pro Vectorized protein suffix masses.
+   * @param[in] tags Sequence tags from FLASHTaggerAlgorithm.
+   * @param[in] ppm Mass tolerance in parts per million.
+   * @param[in] multiple_hits_per_spec Whether to retain multiple protein hits for one spectrum.
    */
   void run(std::vector<ProteinHit>& hits,
            const DeconvolvedSpectrum& dspec, const std::vector<int> spec_vec, const std::vector<std::unordered_set<int>>& vec_pro,

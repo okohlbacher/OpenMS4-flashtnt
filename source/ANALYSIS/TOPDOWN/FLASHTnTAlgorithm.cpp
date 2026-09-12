@@ -315,7 +315,8 @@ void FLASHTnTAlgorithm::run(const MSExperiment& map, const std::vector<FASTAFile
 
     if (spec.size() < 5) continue;
 
-    int scan = FLASHDeconvAlgorithm::getScanNumber(map, index);
+    // FLASH's scan parser requires a native ID; synthetic/imported spectra may omit it.
+    int scan = spec.getNativeID().empty() ? index + 1 : FLASHDeconvAlgorithm::getScanNumber(map, index);
 
     DeconvolvedSpectrum dspec(scan);
     dspec.setOriginalSpectrum(spec);

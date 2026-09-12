@@ -49,8 +49,8 @@ public:
 
   /**
     @brief Generate the tags from the input deconvolved spectrum with given ppm tolerance
-    @param deconvolved_spectrum deconvolved spectrum from FLASHDeconv
-    @param ppm The acceptable ppm tolerance for mass
+    @param[in] deconvolved_spectrum Deconvolved spectrum from FLASHDeconv.
+    @param[in] ppm Acceptable mass tolerance in parts per million.
 
   */
   void run(const DeconvolvedSpectrum& deconvolved_spectrum, double ppm);

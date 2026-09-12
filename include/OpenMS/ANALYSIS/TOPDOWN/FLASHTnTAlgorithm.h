@@ -22,7 +22,7 @@
 namespace OpenMS
 {
 /**
-@brief
+@brief Identify top-down proteoforms by matching sequence tags and extending candidate protein hits.
 @ingroup Topdown
 */
 
@@ -44,14 +44,14 @@ public:
   /// assignment operator
   FLASHTnTAlgorithm& operator=(const FLASHTnTAlgorithm& other);
 
-  /// Find sequence tags from @p mzs and @p intensities then store them in @p tags.
   /**
-    @brief
-    Decoy or MS level 1 spectra are removed by this process.
-    Overlapping PeakGroups in merged spectra are also removed.
+    @brief Generate sequence tags, match the protein database, and score extended proteoform candidates.
 
-    @param map spectra deconvolved by FLASHDeconv.
-    @param fasta_entry fasta entry to searched against
+    @param[in] map Spectra deconvolved by FLASHDeconv, including DeconvMassInfo metadata.
+    @param[in] fasta_entry Target and optional decoy protein sequences to search.
+
+    @throws Exception::MissingInformation if FLASHDeconv metadata is missing.
+    @throws Exception::InvalidValue if metadata dimensions are invalid or no target proteins are supplied.
 
   */
   void run(const MSExperiment& map, const std::vector<FASTAFile::FASTAEntry>& fasta_entry);
