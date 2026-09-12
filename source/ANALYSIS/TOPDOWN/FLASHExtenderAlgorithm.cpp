@@ -155,7 +155,7 @@ namespace OpenMS
     {
       if (aa == 'X') pro_masses.push_back(pro_masses.back()); // repeat the previous mass
       else
-        pro_masses.push_back(pro_masses.back() + AASequence::fromString(aa, true).getMonoWeight(Residue::Internal));
+        pro_masses.push_back(pro_masses.back() + AASequence::fromString(std::string(1, aa), true).getMonoWeight(Residue::Internal));
     }
   }
 
