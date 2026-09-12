@@ -108,6 +108,8 @@ namespace OpenMS
         proj = getProIndex_(*iter1, pro_size);
         if (proi + proj >= (int)hit.getSequence().size()) break;
       }
+      // No complementary prefix reached the required protein position.
+      if (iter1 == bp1.rend()) continue;
       if (getScore_(*iter0) < terminal_score_threshold || getScore_(*iter1) < terminal_score_threshold) continue; //
       int excessive_aa = (proi + proj) - (int)hit.getSequence().size();
 

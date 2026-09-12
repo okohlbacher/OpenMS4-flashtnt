@@ -42,11 +42,18 @@ and uses a sequential scan number when a spectrum has no native ID.
 Open-ended extension uses an endpoint of -1. The port fixes an inherited
 out-of-bounds read by inspecting the endpoint spectrum entry only when the
 endpoint is specified. The AQPZ test exercises this path and reproduced the
-invalid read under AddressSanitizer before the fix. To check it with GCC or
+invalid read under AddressSanitizer before the fix. Precursor estimation also
+skips an exhausted complementary-path iterator before dereferencing it; the
+same fixture exposed this second inherited out-of-bounds read. To check with GCC or
 Clang, use a separate build with
 `-DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g"`
 and run the same CTest suite. Dependencies must use a compatible compiler/runtime.
 `-DOPENMS4_WARNINGS_AS_ERRORS=ON` promotes package compiler warnings to errors.
+
+Tag overlap checks explicitly use floating-point `std::abs`. The unqualified
+upstream call selected integer `abs` with GCC 14.4 but floating-point `abs` with
+Apple Clang 21, truncating sub-Dalton differences on Linux. The port contract
+checks two peptide mass ladders separated by 0.5 Da to prevent this regression.
 
 CTest also runs the bundled AQPZ example with FLASHApp's saved parameters. It
 requires nonempty result tables, the expected strongest AQPZ identification and

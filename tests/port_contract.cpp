@@ -3,6 +3,7 @@
 // $Maintainer: Oliver Kohlbacher $
 #include <OpenMS/ANALYSIS/TOPDOWN/FLASHTnTHelpers.h>
 #include <OpenMS/ANALYSIS/TOPDOWN/FLASHTnTAlgorithm.h>
+#include <OpenMS/CHEMISTRY/AASequence.h>
 #include <OpenMS/CHEMISTRY/ProForma.h>
 #include <OpenMS/FORMAT/FLASHTnTFile.h>
 #include <stdexcept>
@@ -42,6 +43,43 @@ int main()
   std::vector<std::vector<OpenMS::Size>> paths;
   graph.findAllPaths(0, 2, paths, 10);
   require(paths == std::vector<std::vector<OpenMS::Size>>{{0, 1, 2}});
+
+  // Two PET ladders 0.5 Da apart exceed 5 ppm and must remain distinct tags.
+  // An integer abs overload incorrectly truncates their difference to zero.
+  OpenMS::DeconvolvedSpectrum ladders(1);
+  double mass = 100.0;
+  for (const auto& residue : std::vector<std::string>{"", "P", "E", "T"})
+  {
+    if (!residue.empty()) mass += OpenMS::AASequence::fromString(residue).getMonoWeight(OpenMS::Residue::Internal);
+    for (double shift : {0.0, 0.5})
+    {
+      OpenMS::PeakGroup peak;
+      peak.setMonoisotopicMass(mass + shift);
+      peak.setQscore(1.0);
+      ladders.push_back(peak);
+    }
+  }
+  OpenMS::PeakGroup sink;
+  sink.setMonoisotopicMass(600.0);
+  sink.setQscore(1.0);
+  ladders.push_back(sink);
+  OpenMS::FLASHTaggerAlgorithm tagger;
+  auto parameters = tagger.getParameters();
+  parameters.setValue("min_length", 3);
+  parameters.setValue("max_length", 3);
+  tagger.setParameters(parameters);
+  tagger.run(ladders, 5.0);
+  std::vector<OpenMS::FLASHTnTHelpers::Tag> ladder_tags;
+  tagger.fillTags(ladder_tags);
+  std::set<double> nterm_masses;
+  for (const auto& candidate : ladder_tags)
+  {
+    if (candidate.getSequence() == "PET" && candidate.getNtermMass() >= 0)
+    {
+      nterm_masses.insert(candidate.getNtermMass());
+    }
+  }
+  require(nterm_masses == std::set<double>{100.0, 100.5});
 
   OpenMS::MSExperiment experiment;
   OpenMS::MSSpectrum spectrum;
