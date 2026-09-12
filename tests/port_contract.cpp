@@ -13,6 +13,12 @@ int main()
   auto require = [](bool condition) { if (!condition) throw std::runtime_error("FLASHTnT port contract failed"); };
   require(FLASHTnTFile::generateProFormaString_("PEPTIDE", 0, 7, {}, {}, {}, {}) == "PEPTIDE");
   require(FLASHTnTFile::generateProFormaString_("MPEPTIDE", 1, 8, {15.9949}, {2}, {2}, {"Oxidation"}) == "PE[Oxidation]PTIDE");
+  require(FLASHTnTFile::generateProFormaString_("MPEPTIDE", 1, 8, {15.9949}, {2}, {2}, {"Oxidation,"}) == "PE[Oxidation]PTIDE");
+  const auto ambiguous = FLASHTnTFile::generateProFormaString_("MPEPTIDE", 1, 8, {15.9949}, {2}, {2}, {"Oxidation,Hydroxylation,"});
+  const auto parsed_ambiguous = OpenMS::ProForma::parse(ambiguous);
+  const auto& ambiguous_residue = std::get<OpenMS::ProForma::SequenceElement>(parsed_ambiguous.sequence[1]);
+  const auto& delta = std::get<OpenMS::ProForma::MassDelta>(ambiguous_residue.modifications[0].alternatives[0].first);
+  require(std::abs(delta.mass - 15.9949) < 0.00001);
   const auto range = FLASHTnTFile::generateProFormaString_("PEPTIDE", 0, 7, {79.9663}, {1}, {3}, {"Phospho"});
   require(range == "P(EPT)[Phospho]IDE");
   require(OpenMS::ProForma::toString(OpenMS::ProForma::parse(range)) == range);

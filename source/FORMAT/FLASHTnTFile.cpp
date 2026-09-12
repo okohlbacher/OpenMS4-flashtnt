@@ -75,7 +75,7 @@ void FLASHTnTFile::writeTags(const FLASHTnTAlgorithm& tnt, double flanking_mass_
         std::string proteindescription = hit.getDescription();
         if (proteindescription.empty()) { proteindescription = " "; }
         description += proteindescription;
-        hitindices += (std::string)hit.getMetaValue("Index");
+        hitindices += hit.getMetaValue("Index").toString();
 
         auto pos = std::vector<int>();
         auto masses = std::vector<double>();
@@ -143,12 +143,18 @@ std::string FLASHTnTFile::generateProFormaString_(const std::string& sequence,
   for (size_t i = 0; i < mod_masses.size(); ++i)
   {
     ProForma::Modification modification;
-    if (!mod_ids[i].empty())
+    // The extender records a comma-terminated list of candidate modification names.
+    std::vector<std::string> candidates;
+    StringUtils::split(mod_ids[i], ',', candidates);
+    for (auto& candidate : candidates) StringUtils::trim(candidate);
+    candidates.erase(std::remove(candidates.begin(), candidates.end(), ""), candidates.end());
+    if (candidates.size() == 1)
     {
-      modification.alternatives.emplace_back(ProForma::NamedMod{std::nullopt, mod_ids[i]}, std::nullopt);
+      modification.alternatives.emplace_back(ProForma::NamedMod{std::nullopt, candidates.front()}, std::nullopt);
     }
     else
     {
+      // Multiple candidates do not identify one modification; retain the observed mass delta.
       modification.alternatives.emplace_back(ProForma::MassDelta{ProForma::MassDelta::Source::NONE, mod_masses[i], {}}, std::nullopt);
     }
     const int start = mod_starts[i] - seq_start;
