@@ -171,6 +171,30 @@ def main() -> None:
         # Preserve scientific comparisons even when native acceptance fails.
         if (build / "aqpz-results").is_dir():
             shutil.copytree(build / "aqpz-results", results / "aqpz", dirs_exist_ok=True)
+    if args.platform == "linux-x64":
+        # The AQPZ fixture reaches inherited iterator/sentinel boundary defects
+        # that ordinary optimized execution can hide. Instrument this package;
+        # keep the released providers and distributable build unchanged.
+        sanitized = work / "sanitizer-build"
+        run("configure-sanitizers", ["cmake", "-S", str(source), "-B", str(sanitized),
+            f"-DCMAKE_PREFIX_PATH={';'.join(prefixes)}", "-DBUILD_TESTING=ON",
+            "-DOPENMS4_WARNINGS_AS_ERRORS=ON",
+            "-DCMAKE_CXX_FLAGS=-g -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined", *common])
+        run("build-sanitizers", ["cmake", "--build", str(sanitized),
+                                "--parallel", str(args.jobs)])
+        saved_env = env.copy()
+        env.update(ASAN_OPTIONS="detect_leaks=1:halt_on_error=1",
+                   UBSAN_OPTIONS="halt_on_error=1:print_stacktrace=1")
+        try:
+            run("test-sanitizers", ["ctest", "--test-dir", str(sanitized),
+                "--output-on-failure", "--no-tests=error", "--parallel", str(args.jobs),
+                "--output-junit", str(results / "sanitizers.xml")])
+        finally:
+            env.clear()
+            env.update(saved_env)
+            if (sanitized / "aqpz-results").is_dir():
+                shutil.copytree(sanitized / "aqpz-results", results / "aqpz-sanitizers", dirs_exist_ok=True)
     run("install-package", ["cmake", "--install", str(build), "--config", configuration])
     check_install(install, tools, windows)
     env["OPENMS_TOOL_PREFIX_PATH"] = str(install)

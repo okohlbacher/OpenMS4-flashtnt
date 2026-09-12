@@ -48,10 +48,13 @@ same fixture exposed this second inherited out-of-bounds read. To check with GCC
 Clang, use a separate build with
 `-DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g"`
 and run the same CTest suite. Dependencies must use a compatible compiler/runtime.
+The Linux x64 CI driver runs this additional instrumented build with address,
+undefined-behavior and leak detection before it publishes the ordinary Release
+payload. It retains the sanitizer logs and scientific comparison output.
 `-DOPENMS4_WARNINGS_AS_ERRORS=ON` promotes package compiler warnings to errors.
 
-Tag overlap checks explicitly use floating-point `std::abs`. The unqualified
-upstream call selected integer `abs` with GCC 14.4 but floating-point `abs` with
+Tag overlap checks explicitly use floating-point `std::abs`. In this port, the
+unqualified call inherited from upstream selected integer `abs` with GCC 14.4 but floating-point `abs` with
 Apple Clang 21, truncating sub-Dalton differences on Linux. The port contract
 checks two peptide mass ladders separated by 0.5 Da to prevent this regression.
 
@@ -64,8 +67,9 @@ that cache has no recorded binary revision, and the pinned upstream algorithms
 changed subsequently, including the December 2025 inverse-tag-direction fix
 (`8677e5015860a6ecce5e7bcc35295978040291b1`).
 
-On Linux x64, the four tests passed in 10.47 seconds (AQPZ: 10.13 seconds).
-The port produced 622 tags and 10 protein/PrSM rows; the historical cache has
+Before the memory and floating-point fixes, the four Linux tests passed in
+10.47 seconds (AQPZ: 10.13 seconds). That revision produced 622 tags and
+10 protein/PrSM rows; the historical cache has
 2,968 tags and 17 rows. Its best AQPZ score/matching-fragment count was 559/79,
 compared with 505/69 historically. Database and matched sequences and positions
 1–240 agree, while inferred mass and coverage differ. Restoring the upstream
@@ -77,7 +81,12 @@ At source revision `250debb`, three Mac ARM runs produced byte-identical result
 tables with 698 tags (114 AQPZ tags), while repeated Linux x64 runs produced
 622 tags (96 AQPZ tags). The strongest AQPZ sequence, score, mass, fragment count
 and coverage agree across these platforms; tag counts do not. These observations
-predate the open-ended extension memory fix. Cross-platform numerical
+predate the memory and floating-point fixes.
+
+At `93eb47c`, all four tests pass on Linux x64 (10.10 seconds), macOS ARM
+(5.69 seconds), and Linux with ASan/UBSan and leak detection (36.97 seconds).
+Linux now produces the same 698 tags (114 AQPZ tags), 10 protein/PrSM rows and
+strongest identification fields as macOS. Complete historical numerical
 equivalence remains unqualified, and the historical reference is unchanged.
 
 The untouched historical counts, tag sequence multiplicities, mass, score and
