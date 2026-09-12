@@ -64,5 +64,54 @@
       "git_object": "89ae5da3d00dc5bcac5a9793623056c7126a09bc",
       "extraction": "Tag method implementations only"
     }
-  ]
+  ],
+  "aqpz_fixture": {
+    "repository": "https://github.com/OpenMS/FLASHApp",
+    "source_revision": "f8e9eba435ea0843660c63fe86c58c64798e7f71",
+    "license": "BSD-3-Clause (same notice as License.txt)",
+    "files": [
+      {
+        "upstream_path": "example-data/workspaces/default/flashtnt/cache/files/example_spectrum_aqpz_20250525-203956/database.fasta",
+        "git_object": "b7ad282a361da0ef8935119d56aaf20f513f54a0",
+        "sha256": "85fe7404e3d59da76d46d4a8611a0814f05df451a0d21e8bfdb96fcbd440bd2d",
+        "local_path": "tests/data/aqpz/database.fasta",
+        "extraction": "unchanged input"
+      },
+      {
+        "upstream_path": "example-data/workspaces/default/flashtnt/cache/files/example_spectrum_aqpz_20250525-203956/out_deconv.mzML",
+        "git_object": "f2090e0983701de23a37c05f5bf5af45add1e692",
+        "sha256": "5b0c0381ef5070ddab4eae39591cadca35895f069d6a8fe395cd6c7b245a8825",
+        "local_path": "tests/data/aqpz/out_deconv.mzML",
+        "extraction": "unchanged input"
+      },
+      {
+        "upstream_path": "example-data/workspaces/default/flashtnt/cache/files/example_spectrum_aqpz_20250525-203956/FTnT_parameters.json",
+        "git_object": "aa06203fe1014ae77e54512e830e34348d556a00",
+        "sha256": "9a07437dc8e63d2bdba549649c5fbdf29a4c1320b5f19b7ae3460fe8b6e620ae",
+        "local_path": "tests/data/aqpz/FTnT_parameters.json",
+        "extraction": "unchanged input"
+      },
+      {
+        "upstream_path": "example-data/workspaces/default/flashtnt/cache/files/example_spectrum_aqpz_20250525-203956/protein.tsv",
+        "git_object": "7a6f93c5fabab34392447a82d237053169d2313e",
+        "sha256": "45515f144625e1407d5877d9c0c413f5f49e35319f933b2f914f24989eda416f",
+        "local_path": "tests/data/aqpz/reference.json",
+        "extraction": "column names, row counts, AQPZ best-hit stable fields and tag-sequence multiplicities"
+      },
+      {
+        "upstream_path": "example-data/workspaces/default/flashtnt/cache/files/example_spectrum_aqpz_20250525-203956/prsms.tsv",
+        "git_object": "91328c8b6605181b005056f66ba364d02590863e",
+        "sha256": "3b243738aa9c40ea160f378cc757769526b5b6de8b8c62c14d8c3c15b9fa38ba",
+        "local_path": "tests/data/aqpz/reference.json",
+        "extraction": "column names, row counts, AQPZ best-hit stable fields and tag-sequence multiplicities"
+      },
+      {
+        "upstream_path": "example-data/workspaces/default/flashtnt/cache/files/example_spectrum_aqpz_20250525-203956/tags.tsv",
+        "git_object": "b74199db3661f488ccf8a8fed58000ac21aa1753",
+        "sha256": "e3ebc8e3986b137b2b67b075095b65d73d6f908d78ebdf35495cb91090d03058",
+        "local_path": "tests/data/aqpz/reference.json",
+        "extraction": "column names, row counts, AQPZ best-hit stable fields and tag-sequence multiplicities"
+      }
+    ]
+  }
 }

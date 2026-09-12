@@ -29,4 +29,10 @@ if(BUILD_TESTING)
   target_link_libraries(FLASHTnT_port_contract PRIVATE flashtnt_backend)
   add_test(NAME FLASHTnT_port_contract COMMAND FLASHTnT_port_contract)
   set_tests_properties(FLASHTnT_port_contract PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=2")
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_test(NAME FLASHTnT_AQPZ_identity COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_aqpz.py $<TARGET_FILE:FLASHTnT>
+    ${CMAKE_CURRENT_BINARY_DIR}/aqpz-results)
+  set_tests_properties(FLASHTnT_AQPZ_identity PROPERTIES TIMEOUT 200 ENVIRONMENT
+    "OMP_NUM_THREADS=2;OPENMS_TOOL_PREFIX_PATH=${CMAKE_BINARY_DIR};OPENMS_DISABLE_UPDATE_CHECK=ON")
 endif()
