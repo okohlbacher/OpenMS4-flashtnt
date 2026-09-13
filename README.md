@@ -104,3 +104,25 @@ from public FLASHApp revision `f8e9eba435ea0843660c63fe86c58c64798e7f71`.
 `source-provenance.json` records their original paths, Git objects and SHA-256
 digests, plus the source result tables used for the compact reference. These
 experimental checks do not yet qualify FLASHTnT as a released FLASHApp backend.
+
+<!-- package-graph:begin -->
+## Where this package sits
+
+![OpenMS 4 package architecture](docs/package-architecture.svg)
+
+`flashtnt` builds against the installed **core**, **cli**, **flash** packages at the revisions recorded in [`dependencies.lock.json`](dependencies.lock.json). **flashapp** builds against it.
+
+| Repository | Relation | Contents |
+| --- | --- | --- |
+| [OpenMS4-core](https://github.com/okohlbacher/OpenMS4-core) | dependency | scientific library, OpenSwathAlgo, readers and writers, runtime data, optional TestSupport |
+| [OpenMS4-cli](https://github.com/okohlbacher/OpenMS4-cli) | dependency | TOPPBase, tool registration and discovery |
+| [OpenMS4-flash](https://github.com/okohlbacher/OpenMS4-flash) | dependency | FLASHDeconv and the OpenMS::FLASH backend |
+| [OpenMS4-flashapp](https://github.com/okohlbacher/OpenMS4-flashapp) | consumer | Streamlit application and Vue component |
+
+The eighteen repositories are assembled by the parent repository
+[OpenMS4-tests](https://github.com/okohlbacher/OpenMS4-tests), which holds the submodule pins (`packages.lock.json`), the
+dependency-order build runner and the contract tests that keep the graph consistent.
+[`docs/project-state.md`](https://github.com/okohlbacher/OpenMS4-tests/blob/codex/package-split/docs/project-state.md) is the current state
+of the whole project; [`docs/build-split-packages.md`](https://github.com/okohlbacher/OpenMS4-tests/blob/codex/package-split/docs/build-split-packages.md)
+reproduces the installed-SDK build.
+<!-- package-graph:end -->
