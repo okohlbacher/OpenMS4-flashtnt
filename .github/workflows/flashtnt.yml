@@ -23,7 +23,9 @@ jobs:
     # Fork PRs and new packages without registered runners use hosted machines.
     # Pushes and dispatches build Linux x64 on the IBMI pool and macOS arm64 on the Mac
     # Studio; pull requests from forks must never run there, so they stay hosted.
-    runs-on: ${{ (github.event_name != 'pull_request' && matrix.platform == 'linux-x64' && 'dax-linux-x64') || (github.event_name != 'pull_request' && matrix.platform == 'macos-arm64' && 'studio-macos-arm64') || matrix.runner }}
+    # A pull request always stays on a hosted runner: the repository is public and a fork
+    # must never execute on one of our machines.
+    runs-on: ${{ (github.event_name != 'pull_request' && matrix.pool) || matrix.runner }}
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -31,22 +33,27 @@ jobs:
         include:
           - platform: linux-x64
             runner: ubuntu-24.04
+            pool: dax-linux-x64
             packages: gcc_linux-64=14 gxx_linux-64=14 coin-or-cbc=2.10.*
             jobs: 4
           - platform: linux-arm64
             runner: ubuntu-24.04-arm
+            pool: ''
             packages: gcc_linux-aarch64=14 gxx_linux-aarch64=14 coin-or-cbc=2.10.*
             jobs: 4
           - platform: macos-arm64
             runner: macos-15
+            pool: studio-macos-arm64
             packages: llvm-openmp coin-or-cbc=2.10.*
             jobs: 2
           - platform: macos-x64
             runner: macos-15-intel
+            pool: ''
             packages: llvm-openmp coin-or-cbc=2.10.*
             jobs: 4
           - platform: windows-x64
             runner: windows-2022
+            pool: flashbox-windows-x64
             packages: glpk=5.*
             jobs: 4
     env:
@@ -104,7 +111,7 @@ jobs:
       - name: Build, test, install, and package
         run: >-
           micromamba run -n package-ci python tools/ci/run.py
-          --platform ${{ matrix.platform }} --jobs ${{ (startsWith(runner.name, 'dax') && 24) || (startsWith(runner.name, 'studio') && 8) || matrix.jobs }}
+          --platform ${{ matrix.platform }} --jobs ${{ (startsWith(runner.name, 'dax') && 24) || (startsWith(runner.name, 'studio') && 8) || (startsWith(runner.name, 'DESKTOP') && 8) || matrix.jobs }}
           --core-dir "${{ runner.temp }}/core"
           --cli-source dependencies/cli
           --flash-dir "${{ runner.temp }}/flash"
