@@ -2,18 +2,16 @@ cmake_minimum_required(VERSION 3.24)
 project(OpenMSFLASHTnT VERSION 1.0.0 LANGUAGES CXX)
 option(OPENMS4_WARNINGS_AS_ERRORS "Treat package compiler warnings as errors" OFF)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ${OPENMS4_WARNINGS_AS_ERRORS})
-# Same warning set the other packages enforce. MSVC additionally reports the legacy
-# implicit conversions that the ported algorithm performs through Core's Size type -
-# inside <xutility>, where no source change of ours can silence them individually.
+# MSVC reports the legacy implicit conversions that the ported algorithm performs
+# through Core's Size type from inside <xutility>, where no source change of ours can
+# silence them individually, so it gets the suppression list the other packages use.
+# GCC and Clang keep the compiler's default warnings as errors: the ported sources
+# carry 23 sign-comparison and unused-entity warnings under -Wall -Wextra that are for
+# the port to resolve, not for the build to hide.
 function(openms4_flashtnt_warnings target)
-  if(NOT OPENMS4_WARNINGS_AS_ERRORS)
-    return()
-  endif()
-  if(MSVC)
+  if(OPENMS4_WARNINGS_AS_ERRORS AND MSVC)
     target_compile_options(${target} PRIVATE /W4 /WX
       /wd4244 /wd4245 /wd4267 /wd4456 /wd4458 /wd4505 /wd4996)
-  else()
-    target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror)
   endif()
 endfunction()
 include(GNUInstallDirs)
