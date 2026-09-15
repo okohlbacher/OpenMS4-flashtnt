@@ -21,10 +21,6 @@ jobs:
     name: ${{ matrix.platform }} / Release
     # Existing packages use registered private runners for trusted builds.
     # Fork PRs and new packages without registered runners use hosted machines.
-    # Pushes and dispatches build Linux x64 on the IBMI pool and macOS arm64 on the Mac
-    # Studio; pull requests from forks must never run there, so they stay hosted.
-    # A pull request always stays on a hosted runner: the repository is public and a fork
-    # must never execute on one of our machines.
     runs-on: ${{ (github.event_name != 'pull_request' && matrix.pool) || matrix.runner }}
     timeout-minutes: 120
     strategy:
@@ -67,7 +63,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           repository: okohlbacher/OpenMS4-cli
-          ref: d5213ff3551a8608e4e3f930fd4a6f85a8c82f97
+          ref: 6f50080aa391207a0360e472921f0544f5e0bc6d
           path: dependencies/cli
           persist-credentials: false
       - uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v3
@@ -84,8 +80,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/flash"
-          gh release download flash-v1.0.0-ci.2 --repo okohlbacher/OpenMS4-flash \
-            --pattern "OpenMS4-flash-${{ matrix.platform }}-Release-b2c6771de774.tar.gz*" \
+          gh release download flash-v1.0.0-ci.3 --repo okohlbacher/OpenMS4-flash \
+            --pattern "OpenMS4-flash-${{ matrix.platform }}-Release-0b0dfe14e4c4.tar.gz*" \
             --dir "${{ runner.temp }}/flash"
           cd "${{ runner.temp }}/flash"
           if command -v shasum >/dev/null; then
@@ -98,8 +94,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/core"
-          gh release download core-v4.0.0-ci.2 --repo okohlbacher/OpenMS4-core \
-            --pattern "OpenMS4-core-${{ matrix.platform }}-Release-bc9cc12514c7.tar.gz*" \
+          gh release download core-v4.0.0-ci.5 --repo okohlbacher/OpenMS4-core \
+            --pattern "OpenMS4-core-${{ matrix.platform }}-Release-ac41cc177023.tar.gz*" \
             --dir "${{ runner.temp }}/core"
           cd "${{ runner.temp }}/core"
           if command -v shasum >/dev/null; then
@@ -109,6 +105,8 @@ jobs:
           fi
           tar -xzf *.tar.gz
       - name: Build, test, install, and package
+        env:
+          OPENMS4_SERIAL_TESTS: ${{ startsWith(runner.name, 'studio-') && '1' || '0' }}
         run: >-
           micromamba run -n package-ci python tools/ci/run.py
           --platform ${{ matrix.platform }} --jobs ${{ (startsWith(runner.name, 'dax') && 24) || (startsWith(runner.name, 'studio') && 8) || (startsWith(runner.name, 'DESKTOP') && 8) || matrix.jobs }}
