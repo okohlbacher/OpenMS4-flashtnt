@@ -49,7 +49,7 @@ jobs:
             jobs: 4
           - platform: windows-x64
             runner: windows-2022
-            pool: flashbox-windows-x64
+            pool: ''
             packages: glpk=5.*
             jobs: 4
     env:
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           repository: okohlbacher/OpenMS4-cli
-          ref: 6f50080aa391207a0360e472921f0544f5e0bc6d
+          ref: b65ece7fd5a72b02b87cc18432d917c60b2b4282
           path: dependencies/cli
           persist-credentials: false
       - uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v3
@@ -80,8 +80,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/flash"
-          gh release download flash-v1.0.0-ci.3 --repo okohlbacher/OpenMS4-flash \
-            --pattern "OpenMS4-flash-${{ matrix.platform }}-Release-0b0dfe14e4c4.tar.gz*" \
+          gh release download flash-v1.0.0-ci.4 --repo okohlbacher/OpenMS4-flash \
+            --pattern "OpenMS4-flash-${{ matrix.platform }}-Release-3b5b6e65422a.tar.gz*" \
             --dir "${{ runner.temp }}/flash"
           cd "${{ runner.temp }}/flash"
           if command -v shasum >/dev/null; then
@@ -94,8 +94,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p "${{ runner.temp }}/core"
-          gh release download core-v4.0.0-ci.5 --repo okohlbacher/OpenMS4-core \
-            --pattern "OpenMS4-core-${{ matrix.platform }}-Release-ac41cc177023.tar.gz*" \
+          gh release download core-v4.0.0-ci.6 --repo okohlbacher/OpenMS4-core \
+            --pattern "OpenMS4-core-${{ matrix.platform }}-Release-84847138c0de.tar.gz*" \
             --dir "${{ runner.temp }}/core"
           cd "${{ runner.temp }}/core"
           if command -v shasum >/dev/null; then
